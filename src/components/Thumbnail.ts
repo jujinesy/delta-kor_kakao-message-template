@@ -1,43 +1,68 @@
-import Component from '../Component';
-import ThumbnailModel from '../models/Thumbnail';
-import Link from './Link';
-import ThumbnailItem from './ThumbnailItem';
+import Link, { LinkModel } from './link';
+import CropType from '../crop-type';
+import { Model } from '../types/model';
+import { Component } from '../types/component';
 
-export default class Thumbnail extends Component {
+interface ThumbnailContentModel extends Model {
+  THU: string;
+  H: number;
+  W: number;
+  SC: CropType;
+  LI: boolean;
+  PT: number;
+}
 
-    private link: Link;
-    private thumbnail: ThumbnailItem;
+export interface ThumbnailModel extends Model {
+  L: Partial<LinkModel>;
+  TH: Partial<ThumbnailContentModel>;
+}
 
-    constructor(thumbnail: string = '', link: string | Link = new Link(''), width: number = 0, height: number = 0) {
+export default class Thumbnail implements Component<ThumbnailModel> {
+  public thumbnail: string;
+  public width: number;
+  public height: number;
+  public link: Link;
+  public cropType: CropType = CropType.ORIGINAL;
+  public live: boolean = false;
+  public playTime?: number;
 
-        super();
-        if(typeof link === 'string') link = new Link(link);
-        this.link = link;
-        this.thumbnail = new ThumbnailItem(thumbnail, width, height);
-
+  constructor(thumbnail: string);
+  constructor(thumbnail: string, url: string);
+  constructor(thumbnail: string, link: Link);
+  constructor(thumbnail: string, width: number, height: number, url: string);
+  constructor(thumbnail: string, width: number, height: number, link: Link);
+  constructor() {
+    this.thumbnail = arguments[0];
+    this.width = 0;
+    this.height = 0;
+    this.link = new Link('');
+    switch (arguments.length) {
+      case 1:
+        break;
+      case 2:
+        this.link = arguments[1] instanceof Link ? arguments[1] : new Link(arguments[1]);
+        break;
+      case 4:
+        this.width = arguments[1];
+        this.height = arguments[2];
+        this.link = arguments[3] instanceof Link ? arguments[3] : new Link(arguments[3]);
+        break;
+      default:
+        throw new ReferenceError('Invalid params');
     }
+  }
 
-    get Link(): Link {
-        return this.link;
-    }
-
-    get Thumbnail(): ThumbnailItem {
-        return this.thumbnail;
-    }
-
-    set Link(query: Link) {
-        this.link = query;
-    }
-
-    set Thumbnail(query: ThumbnailItem) {
-        this.thumbnail = query;
-    }
-
-    toJson(): ThumbnailModel {
-        return {
-            L: this.link.toJson(),
-            TH: this.thumbnail.toJson()
-        };
-    }
-
+  toJson(): Partial<ThumbnailModel> {
+    return {
+      L: this.link.toJson(),
+      TH: {
+        THU: this.thumbnail,
+        H: this.height,
+        W: this.width,
+        SC: this.cropType,
+        LI: this.live,
+        PT: this.playTime,
+      },
+    };
+  }
 }

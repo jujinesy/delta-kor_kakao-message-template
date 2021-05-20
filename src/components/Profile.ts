@@ -1,55 +1,34 @@
-import Component from '../Component';
-import ThumbnailItem from './ThumbnailItem';
-import Link from './Link';
-import {TitleDescription} from '../index';
-import ProfileModel from '../models/Profile';
+import { Model } from '../types/model';
+import Thumbnail, { ThumbnailModel } from './thumbnail';
+import Link, { LinkModel } from './link';
+import TitleDesc, { TitleDescModel } from './title-desc';
+import { Component } from '../types/component';
 
-export default class Profile extends Component {
+export interface ProfileModel extends Model {
+  BG: Partial<ThumbnailModel>;
+  L: Partial<LinkModel>;
+  TH: Partial<ThumbnailModel>;
+  TD: Partial<TitleDescModel>;
+}
 
-    private link: Link;
-    private thumbnail: ThumbnailItem;
-    private title: TitleDescription;
+export default class Profile implements Component<ProfileModel> {
+  public readonly background: Thumbnail = new Thumbnail('');
+  public readonly image: Thumbnail;
+  public readonly link: Link;
+  public readonly content: TitleDesc;
 
-    constructor(name: string = '', icon: string = '', link: string | Link = new Link(''), width: number = 0, height: number = 0) {
+  constructor(thumbnail: string, nickname: string, link: string | Link = new Link('')) {
+    this.image = new Thumbnail(thumbnail);
+    this.content = new TitleDesc(nickname);
+    this.link = link instanceof Link ? link : new Link(link);
+  }
 
-        super();
-        if(typeof link === 'string') link = new Link(link);
-        this.link = link;
-        this.thumbnail = new ThumbnailItem(icon, width, height);
-        this.title = new TitleDescription(name);
-
-    }
-
-    get Link(): Link {
-        return this.link;
-    }
-
-    get Image(): ThumbnailItem {
-        return this.thumbnail;
-    }
-
-    get Text(): TitleDescription {
-        return this.title;
-    }
-
-    set Link(query: Link) {
-        this.link = query;
-    }
-
-    set Image(query: ThumbnailItem) {
-        this.thumbnail = query;
-    }
-
-    set Text(query: TitleDescription) {
-        this.title = query;
-    }
-
-    toJson(): ProfileModel {
-        return {
-            L: this.link.toJson(),
-            TH: this.thumbnail.toJson(),
-            TD: this.title.toJson()
-        };
-    }
-
+  toJson(): Partial<ProfileModel> {
+    return {
+      BG: this.background.toJson(),
+      L: this.link.toJson(),
+      TH: this.image.toJson(),
+      TD: this.content.toJson(),
+    };
+  }
 }

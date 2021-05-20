@@ -1,68 +1,28 @@
-import Component from '../Component';
-import SocialModel from '../models/Social';
+import { Model } from '../types/model';
+import { Component } from '../types/component';
 
-export default class Social extends Component {
+export interface SocialModel extends Model {
+  CM: number;
+  LK: number;
+  SH: number;
+  SB: number;
+  VC: number;
+}
 
-    constructor(
-        private comment: number = 0,
-        private like: number = 0,
-        private share: number = 0,
-        private subscribe: number = 0,
-        private view: number = 0
-    ) {
+export default class Social implements Component<SocialModel> {
+  public comment?: number;
+  public like?: number;
+  public share?: number;
+  public subscribe?: number;
+  public view?: number;
 
-        super();
-
-    }
-
-    get Comment(): number {
-        return this.comment;
-    }
-
-    get Like(): number {
-        return this.like;
-    }
-
-    get Share(): number {
-        return this.share;
-    }
-
-    get Subscribe(): number {
-        return this.subscribe;
-    }
-
-    get View(): number {
-        return this.view;
-    }
-
-    set Comment(query: number) {
-        this.comment = query;
-    }
-
-    set Like(query: number) {
-        this.like = query;
-    }
-
-    set Share(query: number) {
-        this.share = query;
-    }
-
-    set Subscribe(query: number) {
-        this.subscribe = query;
-    }
-
-    set View(query: number) {
-        this.view = query;
-    }
-
-    toJson(): SocialModel {
-        return {
-            CM: this.comment,
-            LK: this.like,
-            SH: this.share,
-            SB: this.subscribe,
-            VC: this.view
-        };
-    }
-
+  toJson(): Partial<SocialModel> {
+    return {
+      CM: this.comment,
+      LK: this.like,
+      SH: this.share,
+      SB: this.subscribe,
+      VC: this.view,
+    };
+  }
 }

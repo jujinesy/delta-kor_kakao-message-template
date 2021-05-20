@@ -1,55 +1,65 @@
-import Component from '../Component';
-import LinkModel from '../models/Link';
+import { Component } from '../types/component';
+import { Model } from '../types/model';
 
-export default class Link extends Component {
+export interface LinkModel extends Model {
+  LA: string;
+  LAA: boolean;
+  LAD: string;
+  LAT: 'inweb' | 'web' | 'dialog' | 'page';
+  LCA: string;
+  LCI: string;
+  LCM: string;
+  LCP: string;
+  LEW: string;
+  LI: string;
+  LMO: string;
+  LPC: string;
+}
 
-    private linkPC: string;
-    private linkMobile: string;
+export default class Link implements Component<LinkModel> {
+  public windows: string;
+  public mac: string;
+  public android: string;
+  public ios: string;
 
-    constructor(href: string = '') {
-
-        super();
-        this.linkPC = href;
-        this.linkMobile = href;
-
+  constructor(url: string);
+  constructor(pc: string, mobile: string);
+  constructor(windows: string, mac: string, android: string, ios: string);
+  constructor() {
+    switch (arguments.length) {
+      case 1:
+        this.windows = arguments[0];
+        this.mac = arguments[0];
+        this.android = arguments[0];
+        this.ios = arguments[0];
+        break;
+      case 2:
+        this.windows = arguments[0];
+        this.mac = arguments[0];
+        this.android = arguments[1];
+        this.ios = arguments[1];
+        break;
+      case 4:
+        this.windows = arguments[0];
+        this.mac = arguments[1];
+        this.android = arguments[2];
+        this.ios = arguments[3];
+        break;
+      default:
+        throw new ReferenceError('Invalid params');
     }
+  }
 
-    get Global(): string {
-        return this.linkPC || this.linkMobile;
-    }
-
-    get PC(): string {
-        return this.linkPC;
-    }
-
-    get Mobile(): string {
-        return this.linkMobile;
-    }
-
-    set Global(query: string) {
-        this.linkPC = query;
-        this.linkMobile = query;
-    }
-
-    set PC(query: string) {
-        this.linkPC = query;
-    }
-
-    set Mobile(query: string) {
-        this.linkMobile = query;
-    }
-
-    toJson(): LinkModel {
-
-        return {
-            LPC: this.linkPC,
-            LMO: this.linkMobile,
-            LCP: this.linkPC,
-            LCM: this.linkPC,
-            LCA: this.linkMobile,
-            LCI: this.linkMobile
-        };
-
-    }
-
+  toJson(): Partial<LinkModel> {
+    return {
+      LCP: this.windows,
+      LCM: this.mac,
+      LA: this.android,
+      LI: this.ios,
+      LCA: this.android,
+      LCI: this.ios,
+      LPC: this.windows,
+      LMO: this.android,
+    };
+  }
 }

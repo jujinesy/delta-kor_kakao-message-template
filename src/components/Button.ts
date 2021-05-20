@@ -1,43 +1,54 @@
-import Component from '../Component';
-import ButtonModel from '../models/Button';
-import ButtonItem from './ButtonItem';
-import Link from './Link';
+import Link, { LinkModel } from './link';
+import DisplayType from '../display-type';
+import { Model } from '../types/model';
+import { Component } from '../types/component';
 
-export default class Button extends Component {
+interface ButtonContentModel extends Model {
+  HL: boolean;
+  ICO: string;
+  SR: string;
+  T: string;
+}
 
-    private item: ButtonItem;
-    private link: Link;
+export interface ButtonModel extends Model {
+  BU: Partial<ButtonContentModel>;
+  L: Partial<LinkModel>;
+}
 
-    constructor(title: string = '', link: string | Link = new Link('')) {
+export default class Button implements Component<ButtonModel> {
+  public content: string;
+  public readonly link: Link;
+  public displayType: DisplayType = DisplayType.BOTH;
+  public highlight: boolean = false;
+  public icon?: string;
 
-        super();
-        if(typeof link === 'string') link = new Link(link);
-        this.item = new ButtonItem(title);
-        this.link = link;
-
+  constructor(content: string);
+  constructor(content: string, url: string);
+  constructor(content: string, link: Link);
+  constructor() {
+    switch (arguments.length) {
+      case 1:
+        this.content = arguments[0];
+        this.link = new Link('');
+        break;
+      case 2:
+        this.content = arguments[0];
+        this.link = arguments[1] instanceof Link ? arguments[1] : new Link(arguments[1]);
+        break;
+      default:
+        throw new ReferenceError('Invalid params');
     }
+  }
 
-    get Link(): Link {
-        return this.link;
-    }
-
-    get Item(): ButtonItem {
-        return this.item;
-    }
-
-    set Link(query: Link) {
-        this.link = query;
-    }
-
-    set Item(query: ButtonItem) {
-        this.item = query;
-    }
-
-    toJson(): ButtonModel {
-        return {
-            BU: this.item.toJson(),
-            L: this.link.toJson()
-        };
-    }
-
+  toJson(): Partial<ButtonModel> {
+    return {
+      BU: {
+        HL: this.highlight,
+        ICO: this.icon,
+        SR: this.displayType,
+        T: this.content,
+      },
+      L: this.link.toJson(),
+    };
+  }
 }
