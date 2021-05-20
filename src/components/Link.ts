@@ -1,65 +1,76 @@
-import { Component } from '../types/component';
-import { Model } from '../types/model';
+import { Component, Model } from '../component';
 
 export interface LinkModel extends Model {
-  LA: string;
-  LAA: boolean;
-  LAD: string;
-  LAT: 'inweb' | 'web' | 'dialog' | 'page';
-  LCA: string;
-  LCI: string;
-  LCM: string;
-  LCP: string;
-  LEW: string;
-  LI: string;
-  LMO: string;
-  LPC: string;
+    LPC: string;
+    LMO: string;
+    LCA: string;
+    LCI: string;
 }
 
-export default class Link implements Component<LinkModel> {
-  public windows: string;
-  public mac: string;
-  public android: string;
-  public ios: string;
+export class Link extends Component {
 
-  constructor(url: string);
-  constructor(pc: string, mobile: string);
-  constructor(windows: string, mac: string, android: string, ios: string);
-  constructor() {
-    switch (arguments.length) {
-      case 1:
-        this.windows = arguments[0];
-        this.mac = arguments[0];
-        this.android = arguments[0];
-        this.ios = arguments[0];
-        break;
-      case 2:
-        this.windows = arguments[0];
-        this.mac = arguments[0];
-        this.android = arguments[1];
-        this.ios = arguments[1];
-        break;
-      case 4:
-        this.windows = arguments[0];
-        this.mac = arguments[1];
-        this.android = arguments[2];
-        this.ios = arguments[3];
-        break;
-      default:
-        throw new ReferenceError('Invalid params');
+    public Windows: string;
+    public Mac: string;
+    public Android: string;
+    public IOS: string;
+
+    constructor(link: string);
+    constructor(pc: string, mobile: string);
+    constructor(windows: string, mac: string, android: string, ios: string);
+    constructor(...params: string[]) {
+        super();
+        if(params.length === 1) {
+
+            this.Windows = params[0];
+            this.Mac = params[0];
+            this.Android = params[0];
+            this.IOS = params[0];
+
+        } else if(params.length === 2) {
+
+            this.Windows = params[0];
+            this.Mac = params[0];
+            this.Android = params[1];
+            this.IOS = params[1];
+
+        } else if(params.length === 4) {
+
+            this.Windows = params[0];
+            this.Mac = params[1];
+            this.Android = params[2];
+            this.IOS = params[3];
+
+        } else {
+
+            throw new SyntaxError('Invalid link parameters. There must be 1, 2, 4 parameters.');
+
+        }
     }
-  }
 
-  toJson(): Partial<LinkModel> {
-    return {
-      LCP: this.windows,
-      LCM: this.mac,
-      LA: this.android,
-      LI: this.ios,
-      LCA: this.android,
-      LCI: this.ios,
-      LPC: this.windows,
-      LMO: this.android,
-    };
-  }
+    set Pc(query: string) {
+        this.Windows = query;
+        this.Mac = query;
+    }
+
+    set Mobile(query: string) {
+        this.Android = query;
+        this.IOS = query;
+    }
+
+    set All(query: string) {
+        this.Windows = query;
+        this.Mac = query;
+        this.Android = query;
+        this.IOS = query;
+    }
+
+    toJson(): LinkModel {
+        return {
+            LPC: this.Windows,
+            LMO: this.Mac,
+            LCA: this.Android,
+            LCI: this.IOS
+        };
+    }
+
 }
